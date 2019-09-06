@@ -36,14 +36,22 @@ function TimerControl({ time, label, session, onHandleTime }) {
         onClick={() => onHandleTime(`${label}`, false)}
       />
       <h3 className={`${label}-length`}>
+        <Timer time={time} session={session}/>
+      </h3>
+    </div>
+  );
+}
+
+function Timer({ time, session }) {
+    return (
         <Countdown
           date={Date.now() + time * 1000}
           renderer={renderer}
           autoStart={false}
         />
-      </h3>
-    </div>
-  );
+        
+
+    )
 }
 
 /* TimerControl.PropTypes = {
@@ -59,7 +67,7 @@ export default class Pomo extends Component {
     currentSession: 25 * 60,
     currentBreak: 5 * 60,
     timeLeft: 25 * 60,
-    session: true
+    session: false
   };
 
   handleTime = (id, plus) => {
