@@ -1,25 +1,45 @@
 import React, { Component } from "react";
-import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import {
+  FaArrowUp,
+  FaArrowDown,
+  FaPlay,
+  FaPause,
+  FaUndo
+} from "react-icons/fa";
 import Countdown, { zeroPad } from "react-countdown-now";
 import PropTypes from "prop-types";
 
-const renderer = ({ minutes, seconds, completed, session }) => {
-  /*   if (completed) {
-    // Render a complete state
-    return <div>{session ? "Session finished, begin break" : "Break over, next session begins"}</div>;
-  } else {
-    // Render a countdown */
+const renderer = ({ minutes, seconds }) => {
   return (
     <span>
       {minutes}:{zeroPad(seconds)}
     </span>
   );
-  //}
+};
+
+const rendererWithMessage = ({ minutes, seconds, completed, session }) => {
+  if (completed) {
+    // Render a complete state
+    return (
+      <div>
+        {session
+          ? "Session finished, begin break"
+          : "Break over, next session begins"}
+      </div>
+    );
+  } else {
+    // Render a countdown
+    return (
+      <span>
+        {minutes}:{zeroPad(seconds)}
+      </span>
+    );
+  }
 };
 
 function TimerControl({ time, label, session, onHandleTime }) {
   return (
-    <div className="card timer-control">
+    <div className="grid timer-control">
       <h2 id={`${label}-label`}>
         {label === "session" ? "Session" : "Break"} Length
       </h2>
@@ -36,22 +56,28 @@ function TimerControl({ time, label, session, onHandleTime }) {
         onClick={() => onHandleTime(`${label}`, false)}
       />
       <h3 className={`${label}-length`}>
-        <Timer time={time} session={session}/>
+        <Timer time={time} session={session} />
       </h3>
     </div>
   );
 }
 
-function Timer({ time, session }) {
-    return (
-        <Countdown
-          date={Date.now() + time * 1000}
-          renderer={renderer}
-          autoStart={false}
-        />
-        
-
-    )
+function Timer({ time, session, handlePause, handleReset }) {
+  return (
+    <div className="grid">
+      <Countdown
+        date={Date.now() + time * 1000}
+        renderer={renderer}
+        autoStart={false}
+      />
+{/*       {!session ? (
+        <FaPlay id="start_stop" onClick={() => this.handlePause()} />
+      ) : (
+        <FaPause id="start_stop" />
+      )}
+      <FaUndo id="reset" /> */}
+    </div>
+  );
 }
 
 /* TimerControl.PropTypes = {
@@ -62,11 +88,11 @@ function Timer({ time, session }) {
 
 export default class Pomo extends Component {
   state = {
-    defaultSession: 25 * 60,
-    defaultBreak: 5 * 60,
-    currentSession: 25 * 60,
-    currentBreak: 5 * 60,
-    timeLeft: 25 * 60,
+    defaultSession: 1500,
+    defaultBreak: 300,
+    currentSession: 1500,
+    currentBreak: 300,
+    timeLeft: 1500,
     session: false
   };
 
@@ -87,6 +113,14 @@ export default class Pomo extends Component {
     });
   };
 
+  handlePause = () => {
+    this.setState({
+      session: !this.state.session
+    });
+  };
+
+  handleReset = () => {};
+
   render() {
     const { currentSession, currentBreak, timeLeft } = this.state;
     return (
@@ -104,7 +138,7 @@ export default class Pomo extends Component {
         <div className="timer" id="timer-label">
           {this.state.session === true ? "Session" : "Break"}
         </div>
-        <div>
+        <div className="timer">
           <Countdown
             date={
               Date.now() +
@@ -113,12 +147,10 @@ export default class Pomo extends Component {
                 : this.state.currentBreak) *
                 1000
             }
-            renderer={renderer}
+            renderer={rendererWithMessage}
             autoStart={false}
             session={this.state.session}
-          >
-          <span>Test test</span>
-          </Countdown>
+          />
         </div>
       </div>
     );
